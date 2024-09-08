@@ -48,6 +48,12 @@ export function Sidebar({auth,setDataCategory,sidebarCollapsed,handleSidebarColl
             href: 'notesDelete.view',
             activeUrl: '/notes/delete',
             icon: <MdDelete className="me-3 ms-[2px] text-lg my-auto"/>
+        },
+        {
+            name: "Motorcycle",
+            href: 'motorcycle.view',
+            activeUrl: "/motorcycle",
+            icon: <FaMotorcycle className="me-3 ms-[2px] text-lg my-auto"/>
         }
     ]
 

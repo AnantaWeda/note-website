@@ -48,6 +48,11 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     Route::post('account/update', [RegisteredUserController::class, 'update'])->name('register.update');
+
+    Route::get('/motorcycle', [MotorcycleController::class, 'view'])->name('motorcycle.view');
+    Route::post('/motorcycle/create', [MotorcycleController::class, 'create'])->name('motorcycle.create');
+    Route::post('/motorcycle/update', [MotorcycleController::class, 'update'])->name('motorcycle.update');
+    Route::post('/motorcycle/delete', [MotorcycleController::class, 'delete'])->name('motorcycle.delete');
 });
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
