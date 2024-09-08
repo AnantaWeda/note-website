@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NotesHome\CreateRequest;
 use App\Http\Requests\NotesHome\UpdateRequest;
+use App\Models\Category;
 use App\Models\NoteImages;
 use App\Models\Notes;
 use Illuminate\Http\Request;
@@ -22,14 +23,47 @@ class NotesHomeController extends Controller
         $user = Auth::user();
         $data = Notes::select(
             "id_notes",
+            "id_category",
             "title",
             "note",
             DB::raw("DATE_FORMAT(updated_at, '%H:%i') as update_time")
-        )->where('id_users',$user->id_users)->get();
+        )->where([
+            ['id_users',$user->id_users],
+            ['is_archive',0]
+        ])->get();
+
+        $dataCategory = Category::select("*")->where('id_users',$user->id_users)->get();
+
         $token = csrf_token();
 
         return Inertia::render('Home',[
             'data' => $data,
+            'dataCategory' => $dataCategory,
+            'csrf' => $token
+        ]);
+    }
+
+    public function viewByCategory($id_category){
+        $user = Auth::user();
+        $data = Notes::select(
+            "id_notes",
+            "id_category",
+            "title",
+            "note",
+            DB::raw("DATE_FORMAT(updated_at, '%H:%i') as update_time")
+        )->where([
+            ['id_users',$user->id_users],
+            ['id_category',$id_category],
+            ['is_archive',0]
+        ])->get();
+
+        $dataCategory = Category::select("*")->where('id_users',$user->id_users)->get();
+
+        $token = csrf_token();
+
+        return Inertia::render('Home',[
+            'data' => $data,
+            'dataCategory' => $dataCategory,
             'csrf' => $token
         ]);
     }
@@ -38,6 +72,7 @@ class NotesHomeController extends Controller
         $user = Auth::user();
         Notes::create([
             "id_users" => $user->id_users,
+            "id_category" => $request->id_category,
             "title" => $request->title,
             "note" => $request->note
         ]);
@@ -52,6 +87,7 @@ class NotesHomeController extends Controller
             ['id_users', $user->id_users],
         ])->update([
             "title" => $request->title,
+            "id_category" => $request->id_category,
             "note" => $request->note
         ]);
 
@@ -130,6 +166,18 @@ class NotesHomeController extends Controller
             ['id_users', $user->id_users],
             ['id_notes', $id_notes]
         ])->forceDelete();
+
+        return redirect()->back();
+    }
+
+    public function archive(Request $request){
+        $user = Auth::user();
+
+        $status = Notes::find($request->id_notes)->is_archive == 1 ? 0 : 1;
+
+        Notes::find($request->id_notes)->update([
+            "is_archive" => $status
+        ]);
 
         return redirect()->back();
     }

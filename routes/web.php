@@ -3,7 +3,9 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\MotorcycleController;
 use App\Http\Controllers\NotesArchiveController;
+use App\Http\Controllers\NotesCategoryController;
 use App\Http\Controllers\NotesDeleteController;
 use App\Http\Controllers\NotesHomeController;
 use App\Http\Controllers\ProfileController;
@@ -23,9 +25,13 @@ use Inertia\Inertia;
 */
 Route::middleware('auth')->group(function () {
     Route::get('/', [NotesHomeController::class, 'view'])->name('home.view');
+    Route::get('/category/{id_category}', [NotesHomeController::class, 'viewByCategory'])->name('home.view.category');
     Route::post('/action/note/create', [NotesHomeController::class, 'create'])->name('home.create');
     Route::post('/action/note/restore', [NotesHomeController::class, 'restore'])->name('home.restore');
-    Route::put('/action/note/update', [NotesHomeController::class, 'update'])->name('home.update');
+
+    Route::post('/action/note/update', [NotesHomeController::class, 'update'])->name('home.update');
+    Route::post('/action/note/archive', [NotesHomeController::class, 'archive'])->name('home.archive');
+
     Route::delete('/action/note/soft/delete/{id_notes}', [NotesHomeController::class, 'softDelete'])->name('home.soft.delete');
     Route::delete('/action/note/delete/{id_notes}', [NotesHomeController::class, 'delete'])->name('home.delete');
 
@@ -35,7 +41,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/notes/archive', [NotesArchiveController::class, 'view'])->name('notesArchive.view');
     Route::get('/notes/delete', [NotesDeleteController::class, 'view'])->name('notesDelete.view');    
 
+    Route::post('/action/note/category/create', [NotesCategoryController::class, 'create'])->name('category.create');
+    Route::post('/action/note/category/update', [NotesCategoryController::class, 'update'])->name('category.update');
+    Route::delete('/action/note/category/delete/{id_category}', [NotesCategoryController::class, 'delete'])->name('category.delete');
+
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    Route::post('account/update', [RegisteredUserController::class, 'update'])->name('register.update');
 });
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');

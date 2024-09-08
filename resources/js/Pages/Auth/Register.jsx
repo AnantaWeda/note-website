@@ -31,7 +31,7 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
             <h1 className='mb-5 font-bold text-2xl text-center'>Register</h1>
-            <p className='mb-3 text-center'>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque, incidunt?</p>
+            <p className='mb-3 text-center'>We are thrilled to have you here. Creating an account is simple and quick.</p>
             <form onSubmit={submit}> 
                 <div className='mt-3'>
                     <Label htmlFor="email">Email</Label>
@@ -58,9 +58,9 @@ export default function Register() {
                     <Input id="profile" type="file" onChange={e => setData('profile',e.target.files[0])}/>
                     <ErrorMessage message={errors.profile} className="ms-1"/>
                 </div>
-                <Button className="w-full mt-5">Register</Button>
+                <Button className="w-full mt-5" type="submit">Register</Button>
             </form>
-            <Link href={route('register')} className='text-xs ps-1'>Already Registered ?</Link>
+            <Link href={route('login')} className='text-xs ps-1'>Already Registered ?</Link>
             <div className='relative pb-2 pt-6 flex items-center justify-center'>
                 <div className='absolute border w-[160px] border-black'></div>
                 <p className='bg-background2 text-xs z-10 px-2'>Or Sign in with</p>

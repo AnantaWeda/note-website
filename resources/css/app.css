@@ -96,5 +96,7 @@
   .quill > .ql-container > .ql-editor.ql-blank::before{
     @apply dark:text-gray-300 text-black;
   }
-
+  input[type=file]::file-selector-button {
+    @apply dark:text-gray-300 text-black;
+  }
 }

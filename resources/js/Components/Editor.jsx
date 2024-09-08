@@ -1,5 +1,3 @@
-import ReactQuill, { Quill } from "react-quill";
-import ImageResize from 'quill-image-resize-module-react';
 import { 
     MdFormatBold, 
     MdFormatItalic, 
@@ -14,11 +12,15 @@ import { IoMdColorPalette } from "react-icons/io";
 import { domToString } from "@/lib/utils";
 import { FaImage } from "react-icons/fa6";
 import { LuHeading1,LuHeading2 } from "react-icons/lu";
+import ReactQuill, { Quill } from "react-quill";
+import ImageResize from 'quill-image-resize-module-react';
 import ImageUploader from "quill-image-uploader";
 import 'quill-image-uploader/dist/quill.imageUploader.min.css';
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useToast } from "./ui/use-toast";
-import { cva } from "class-variance-authority";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { CategoryContext } from "@/context/CategoryContext";
+import { useTheme } from "./ThemeProvider";
 
 Quill.register("modules/imageUploader", ImageUploader);
 Quill.register('modules/imageResize', ImageResize);
@@ -84,78 +86,134 @@ const EditorComponent = ({valueNote, setValueNote, csrf, disabled}) => {
     );
 };
 
-const ToolbarComponent = ({value}) => {
+const ToolbarComponent = ({value,setValue}) => {
   const [categoryShow, setCategoryShow] = useState(false);
-  const [category, setCategory] = useState("green");
+  const [category, setCategory] = useState(value);
 
-  const categoryColor = cva(
-    "transition-all",
-    {
-        variants:{
-            variant:{
-                green: "bg-green-500 border-green-700",
-                purple: "bg-purple-500 border-purple-700",
-                yellow: "bg-yellow-500 border-yellow-700",
-                red: "bg-red-500 border-red-700",
-            },
-            status:{
-              active: "ring-ring ring-offset-2 border-none"
-            },
-            element:{
-              button: "w-5 h-5 rounded-full cursor-pointer border-2 ring-offset-background ring-2 ms-2"
-            }
-        }
-    }
-  );
+  const {dataCategory} = useContext(CategoryContext);
+
+  const { categoryColor } = useTheme()
+
+  const backgroundColorToolbar = (id_category) => 
+    categoryColor({variant: dataCategory.find(res => res.id_category === id_category)?.color})
 
   useEffect(() => {
-    console.log(category)
-    value(categoryColor({
-      variant: category,
-    }))
+    setValue(category)
   },[category]);
 
+  const toolbarOption = [
+    {
+      name: 'category',
+      icon: (className) => <IoMdColorPalette className={className} />,
+      props: {onClick: () => setCategoryShow(prev => !prev) }
+    },
+    {
+      name: 'bold',
+      icon: (className) => <MdFormatBold className={className} />
+    },
+    {
+      name: 'italic',
+      icon: (className) => <MdFormatItalic className={className} />
+    },
+    {
+      name: 'underline',
+      icon: (className) => <MdFormatUnderlined className={className} />
+    },
+    {
+      name: 'image',
+      icon: (className) => <FaImage className={className} />
+    },
+    {
+      name: 'header',
+      sub: [
+        {
+          name: '1',
+          icon: (className) => <LuHeading1 className={className}/>
+        },
+        {
+          name: '2',
+          icon: (className) => <LuHeading2 className={className}/>
+        },
+      ],
+    },
+    {
+      name: 'blockquote',
+      icon: (className) => <MdFormatQuote className={className} />
+    },
+    {
+      name: 'code-block',
+      icon: (className) => <MdOutlineCode className={className} />
+    },
+    {
+      name: 'list',
+      sub: [
+        {
+          name: 'ordered',
+          icon: (className) => <MdOutlineFormatListNumbered className={className}/>
+        },
+        {
+          name: 'bullet',
+          icon: (className) => <MdOutlineFormatListBulleted className={className}/>
+        },
+      ],
+    },
+    {
+      name: 'indent',
+      sub: [
+        {
+          name: '+1',
+          icon: (className) => <MdFormatIndentIncrease className={`${className} rotate-180`}/>
+        },
+        {
+          name: '-1',
+          icon: (className) => <MdFormatIndentIncrease className={className}/>
+        },
+      ],
+    },
+  ]
+
+  const classIcon = "text-lg text-white group-[.ql-active]:text-gray-400"
+
   var icons = Quill.import('ui/icons');
-  icons['category'] =  domToString(<IoMdColorPalette className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['bold'] =  domToString(<MdFormatBold className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['italic'] = domToString(<MdFormatItalic  className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['underline'] = domToString(<MdFormatUnderlined className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['image'] = domToString(<FaImage className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['header']['1'] = domToString(<LuHeading1 className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['header']['2'] = domToString(<LuHeading2 className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['blockquote'] = domToString(<MdFormatQuote className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['code-block'] = domToString(<MdOutlineCode className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['list']['ordered'] = domToString(<MdOutlineFormatListNumbered className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['list']['bullet'] = domToString(<MdOutlineFormatListBulleted className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
-  icons['indent']['+1'] = domToString(<MdFormatIndentIncrease className="text-lg text-white group-[.ql-active]:text-white rotate-180"/>);
-  icons['indent']['-1'] = domToString(<MdFormatIndentIncrease className="text-lg text-white group-[.ql-active]:text-gray-400"/>);
+  toolbarOption.forEach((res) => {
+    if(!res?.sub){
+      icons[res.name] = domToString(res.icon(classIcon))
+    }else{
+      res.sub.forEach(res2 => {
+        icons[res.name][res2.name] = domToString(res2.icon(classIcon))
+      })
+    }
+  });
 
   return (
     <div className="relative flex">
-      {/* <button className={`ql-category group ms-2`} type="button" title="Category" onClick={() => setCategoryShow(prev => !prev)}>
-        <IoMdColorPalette className="text-lg text-white group-[.ql-active]:text-gray-400"/>
-      </button> */}
-      <div className={`flex items-center gap-4 ${categoryColor({variant: category})} absolute h-full left-9 z-40 ${!categoryShow ? 'w-0' : 'w-full'} overflow-hidden`}>
-        <div className={categoryColor({variant: "green", element: "button",status: category === "green" ? "active" : null})} onClick={() => setCategory("green")}></div>
-        <div className={categoryColor({variant: "yellow", element: "button",status: category === "yellow" ? "active" : null})} onClick={() => setCategory("yellow")}></div>
-        <div className={categoryColor({variant: "red", element: "button",status: category === "red" ? "active" : null})} onClick={() => setCategory("red")}></div>
-        <div className={categoryColor({variant: "purple", element: "button",status: category === "purple" ? "active" : null})} onClick={() => setCategory("purple")}></div>
+      <div className={`flex items-center gap-4 ${value ? backgroundColorToolbar(category) : "bg-background"} absolute h-full left-9 z-40 ${!categoryShow ? 'w-0' : 'w-full'} overflow-hidden`}>
+        <TooltipProvider>
+          {dataCategory.map((res,key) => {
+            return(
+              <Tooltip key={key}>
+                <TooltipTrigger asChild>
+                  <div className={categoryColor({variant: res.color, element: "button",status: category === res.id_category ? "active" : null})} onClick={() => setCategory(res.id_category)}></div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{res.name}</p>
+                </TooltipContent>
+              </Tooltip>
+            )
+          })}
+        </TooltipProvider>
       </div>
       <div id="toolbar" className={`!border-none flex overflow-hidden transition-all`}>
         <span className="ql-formats !flex gap-2">
-            <button className="ql-category group" onClick={() => setCategoryShow(prev => !prev)} title="Category"></button>
-            <button className="ql-bold group" title="Bold"></button>
-            <button className="ql-italic group" title="Italic"></button>
-            <button className="ql-underline group" title="Underline"></button>
-            <button className="ql-image group" title="Image"></button>
-            <button className="ql-header group" value="1"></button>
-            <button className="ql-header group" value="2"></button>
-            <button className="ql-blockquote group"></button>
-            <button className="ql-code-block group"></button>
-            <button className="ql-list group" value="ordered"></button>
-            <button className="ql-list group" value="bullet"></button>
-            <button className="ql-indent group" value="-1"></button>
-            <button className="ql-indent group" value="+1"></button>
+            {toolbarOption.map((res) => {
+              if(!res?.sub){
+                return <button className={`ql-${res.name} group`} title={res.name} {...res?.props}></button>
+              }else{
+                return res.sub.map(res2 => {
+                  return <button className={`ql-${res.name} group`} value={res2.name}></button>
+                })
+              }
+            })}
         </span>
       </div>
   

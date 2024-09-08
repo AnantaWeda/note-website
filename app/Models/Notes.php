@@ -17,6 +17,7 @@ class Notes extends Model
         "id_users",
         "id_category",
         "title",
-        "note"
+        "note",
+        "is_archive"
     ];
 }

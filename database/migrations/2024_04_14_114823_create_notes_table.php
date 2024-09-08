@@ -17,9 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('id_category')->nullable();
             $table->string('title');
             $table->longText('note')->nullable();
-            $table->boolean('is_archive')->default(true);
+            $table->boolean('is_archive')->default(false);
             $table->foreign('id_users')->references('id_users')->on('users');
-            $table->foreign('id_category')->references('id_category')->on('category');
+            $table->foreign('id_category')->references('id_category')->on('category')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

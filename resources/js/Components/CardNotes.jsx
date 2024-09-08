@@ -1,27 +1,17 @@
-import { cva } from "class-variance-authority";
 import { Button } from "./ui/button";
 import { cleanHTML } from "@/lib/utils";
 import { TbDotsVertical } from "react-icons/tb";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from "./ui/menubar";
+import { useTheme } from "./ThemeProvider";
 
-export default function CardNotes({title, value, time, variant, className, itemPopover = [], ...props}){
-    const headerColor = cva(
-        "px-3 py-4 flex",
-        {
-            variants:{
-                variant:{
-                    green: ["dark:bg-green-500 bg-green-400"],
-                    purple: ["dark:bg-purple-500 bg-purple-400"]
-                }
-            }
-        }
-    );
-
+export default function CardNotes({title, value, time, variant, className = "", itemPopover = [], ...props}){
+    const { categoryColor } = useTheme()
+    
     return(
         <div className="relative">
             <div className={`rounded-2xl min-h-60 h-full border border-border p-2 hover:shadow-bordered w-[200px] ${className}`} {...props}>
                 <div className='overflow-hidden h-full border border-border text-xs rounded-2xl cursor-pointer shadow-inner'>
-                    <div className={headerColor({variant})}>
+                    <div className={`px-3 py-4 flex ${categoryColor({variant: variant})}`}>
                         <p className='font-bold truncate w-28'>{title}</p>
                         <p className='ms-auto'>{time}</p>
                     </div>

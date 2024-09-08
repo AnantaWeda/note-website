@@ -58,4 +58,32 @@ class RegisteredUserController extends Controller
 
         return redirect(RouteServiceProvider::HOME);
     }
+
+    public function update(Request $request): RedirectResponse{
+        $user = Auth::user();
+        $nameProfile = null;
+
+        $data = [
+            'name' => $request->name
+        ];
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'profile' => ['nullable', File::types(['jpg','png','jpeg'])->max(2000)],
+        ]);
+
+        if($request->profile){
+            $nameProfile = Str::random().'.'.$request->profile->getClientOriginalExtension();
+            Storage::disk('public')->putFileAs("profile",$request->profile,$nameProfile);
+            $data['profile'] = env("APP_URL")."/storage/profile/$nameProfile";
+        }
+
+        if($request->password){
+            $data["password"] = Hash::make($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->back();
+    }
 }

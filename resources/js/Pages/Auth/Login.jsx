@@ -30,7 +30,7 @@ export default function Login() {
         <GuestLayout>
             <Head title="Log in" />
             <h1 className='mb-5 font-bold text-2xl text-center'>Login</h1>
-            <p className='mb-6 text-center'>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque, incidunt?</p>
+            <p className='mb-6 text-center'>We are excited to see you again. Please enter your login credentials below.</p>
             <form onSubmit={submit}>
                 <div className='mt-3'>
                     <Label htmlFor="email">Email</Label>

@@ -1,14 +1,23 @@
 import { FaPlusCircle,FaFileArchive } from "react-icons/fa";
+import { AiOutlineEdit } from "react-icons/ai";
+import { IoTrashOutline } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { ModeToggle } from "./ModeToggle";
 import { cva } from "class-variance-authority";
 import ProfileSidebar from "./ProfileSidebar";
-import { Link,usePage } from '@inertiajs/react';
+import { Link,router,usePage } from '@inertiajs/react';
 import { Button } from "./ui/button";
+import { useContext } from "react";
+import { CategoryContext } from "@/context/CategoryContext";
+import { useToast } from "./ui/use-toast";
+import { useTheme } from "./ThemeProvider";
+import { FaMotorcycle } from "react-icons/fa6";
 
-
-export function Sidebar({auth ,sidebarCollapsed, handleSidebarCollapsed}){
+export function Sidebar({auth,setDataCategory,sidebarCollapsed,handleSidebarCollapsed,handleOpenCreateCategory}){
+    const {dataCategory} = useContext(CategoryContext);
     
+    const { toast } = useToast();
+
     const linkActive = cva(
         "text-sm rounded-md p-2 justify-start inline-flex w-full cursor-pointer my-[1px]",
         {
@@ -20,19 +29,6 @@ export function Sidebar({auth ,sidebarCollapsed, handleSidebarCollapsed}){
             }
         }
     );
-
-    const tagActive = cva(
-        "w-3 h-3 my-auto rounded-full me-3",
-        {
-            variants:{
-                variant:{
-                    red: "bg-red-500",
-                    green: "bg-green-500",
-                    purple: "bg-purple-500",
-                }
-            }
-        }
-    )
 
     const linkSidebar = [
         {
@@ -55,22 +51,21 @@ export function Sidebar({auth ,sidebarCollapsed, handleSidebarCollapsed}){
         }
     ]
 
-    const listTag = [
-        {
-            name: "Important",
-            color: "red"
-        },
-        {
-            name: "School",
-            color: "green"
-        },
-        {
-            name: "Working",
-            color: "purple"
-        }
-    ]
-
     const { url } = usePage()
+
+    const { categoryColor } = useTheme()
+
+    const handleDelete = (id_category) => {
+        router.delete(route('category.delete',id_category),{
+            onSuccess:() => {
+                toast({
+                    variant: "success",
+                    title: "Success!",
+                    description: "Your notes have been successfully deleted.",
+                })
+            }
+        })
+    }
 
     return(
         <div className="relative">
@@ -97,16 +92,28 @@ export function Sidebar({auth ,sidebarCollapsed, handleSidebarCollapsed}){
                             })}
                         </ul>
                         <hr className="my-5"/>
+                        <div className="flex mb-2">
+                            <h3 className="ms-2  text-md font-bold my-auto">Category : </h3>
+                            <Button variant="bordered" className="rounded-full w-7 h-8 text-sm ms-auto me-5" onClick={handleOpenCreateCategory}>+</Button>
+                        </div>
                         <ul>
-                            {listTag.map((res,key) => {
+                            {dataCategory.length ? dataCategory.map((res,key) => {
                                 return(
-                                    <li key={key}>
-                                        <div className="text-sm rounded-md hover:bg-primary/20 p-2 justify-start inline-flex w-full cursor-pointer my-[1px]">
-                                            <span className={tagActive({variant:res.color})}></span>{res.name}
+                                    <li className="relative group" key={key}>
+                                        <Link href={route('home.view.category',res.id_category)} className="text-sm rounded-md group-hover:bg-primary/20 justify-start inline-flex w-full cursor-pointer my-[1px]">
+                                            <span className={`w-3 h-3 my-auto ms-2 rounded-full me-3 ${categoryColor({variant:res.color})}`}></span>
+                                            <p className="truncate w-full my-2 max-w-48">{res.name}</p>
+                                            
+                                        </Link>
+                                        <div className="absolute h-full bg-gradient-to-l top-0 group-hover:block hidden from-background to-primary/5 end-0 rounded-r-md">
+                                            <button className="bg-background2 p-[5px] rounded-md me-1 ms-0 mt-[6px]" onClick={() => setDataCategory(res)}><AiOutlineEdit/></button>
+                                            <button className="bg-background2 p-[5px] rounded-md me-1" onClick={() => handleDelete(res.id_category)}><IoTrashOutline/></button>
                                         </div>
                                     </li>
                                 )
-                            })}
+                            }) : (
+                                <p className="text-xs mt-5 text-start ms-2">Add category for your notes</p>
+                            )}
                         </ul>
                     </div>
                 </aside>
